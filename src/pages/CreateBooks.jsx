@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Spinner from "../Components/Spinner";
 import axios from "axios";
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import {useSnackbar} from 'notistack';
 
 const CreateBooks = () => {
@@ -9,7 +9,7 @@ const CreateBooks = () => {
   const [author, setauthor] = useState("");
   const [publishYear, setpublishYear] = useState("");
   const [loading, setloading] = useState(false);
-  const history = useHistory();
+  const navigate = useNavigate();
   const {enqueueSnackbar} = useSnackbar();
 
   const savebook = () => {
@@ -34,7 +34,7 @@ const CreateBooks = () => {
         .then(() => {
           setloading(false);
           enqueueSnackbar(`Book ${data.title} created successfully!`, { variant: 'success' });
-          history.push("/");
+          navigate("/");
         })
         .catch((err) => {
           setloading(false);
