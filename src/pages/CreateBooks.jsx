@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Spinner from "../Components/Spinner";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useHistory } from 'react-router-dom';
 import {useSnackbar} from 'notistack';
 
 const CreateBooks = () => {
@@ -9,7 +9,7 @@ const CreateBooks = () => {
   const [author, setauthor] = useState("");
   const [publishYear, setpublishYear] = useState("");
   const [loading, setloading] = useState(false);
-  const navigate = useNavigate();
+  const history = useHistory();
   const {enqueueSnackbar} = useSnackbar();
 
   const savebook = () => {
@@ -18,19 +18,34 @@ const CreateBooks = () => {
       author,
       publishYear
     };
-    setloading(true);
-    axios
-      .post("http://localhost:5555/books", data)
-      .then(() => {
+  
+    if (parseInt(publishYear)) {
+      if (parseInt(publishYear) < 0) {
         setloading(false);
-        enqueueSnackbar(`Book ${data.title} created successfully!`, {variant: 'success'});
-        navigate("/");
-      })
-      .catch((err) => {
-        setloading(false);
-        enqueueSnackbar(`Unfortunately an error has occured! ${err}`, {variant: 'error'});
-        console.log(err);
-      });
+        const error = new Error("Publish year cannot be less than 0");
+        enqueueSnackbar(`Unfortunately an error has occurred! ${error.message}`, { variant: 'error' });
+        console.log(error);
+        return;
+      }
+      
+      setloading(true);
+      axios
+        .post("http://localhost:5555/books", data)
+        .then(() => {
+          setloading(false);
+          enqueueSnackbar(`Book ${data.title} created successfully!`, { variant: 'success' });
+          history.push("/");
+        })
+        .catch((err) => {
+          setloading(false);
+          enqueueSnackbar(`Unfortunately an error has occurred! ${err}`, { variant: 'error' });
+          console.log(err);
+        });
+    } else {
+      const error = new Error("Invalid publish year");
+      enqueueSnackbar(`Unfortunately an error has occurred! ${error.message}`, { variant: 'error' });
+      console.log(error);
+    }
   };
 
   return (
